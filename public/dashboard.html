@@ -1,0 +1,347 @@
+	
+	<table style="height:100%;width:100%">
+	
+	<tr>		
+		<td style="border:solid;width:50%" align="center" >
+			<div id="piechart" width="400" height="250"/>
+			<h1 align="center">HealthStatus</h1>
+				
+		</td>
+		<td style="border:solid;width:50%" align="left" >
+			<div id="divHealthy" style="padding:10px">
+				
+			<button type="button" id="btnShow">Show Details!!</button>
+			</div>
+			
+		</td>
+	</tr>
+	<tr id="chart"  style="display:none" >
+		<td style="border:solid;width:50%" align="center">
+			<canvas id="mycanvas1" width="400" height="250"/>
+			<h1>HeartRate</h1>
+		</td>
+		<td style="border:solid;width:50%" align="center">
+			<canvas id="mycanvas2" width="400" height="250"/>
+			<h1>BloodPressure</h1>
+		</td>
+	</tr>
+	<tr id="chart1"  style="display:none">
+		<td style="border:solid" align="center">
+			<canvas id="mycanvas3" width="400" height="250"/>
+			<h1>EMG</h1>
+		</td>
+		<td style="border:solid" align="center">
+			<canvas id="mycanvas4" width="400" height="250"/>
+			<h1>Respiration</h1>
+		</td>
+	</tr>
+	<tr id="chart2"  style="display:none" >
+		<td style="border:solid" align="center">
+			<canvas id="mycanvas5" width="400" height="250"/>
+			<h1>Temperature</h1>
+		</td>
+		<td style="border:solid" align="center">
+			<canvas id="mycanvas6" width="400" height="250"/>
+			<h1>BloodGlucose </h1>
+		</td>
+	</tr>
+	
+</table>
+
+
+<script>
+$(document).ready(function(){
+	google.charts.setOnLoadCallback(getHealth);	
+	getHeartRate();
+	getBloodPressure();
+	getEMG();
+	getRespiration();
+	getTemperature();
+	getBloodGlucose();
+	$("#btnShow").click(function(){
+		$("#chart").show();				
+		$("#chart1").show();				
+		$("#chart2").show();	
+	});
+});
+
+function getHealth()
+{
+	var healthy=0;
+	var unhealthy=0;
+	
+	$.ajax({
+			url: "getJsonData",
+			type: "GET",
+			dataType: "json",
+			success: function(json, status){	
+				var health = json.health;									
+				var data = new google.visualization.DataTable();
+				data.addColumn('string', 'Health Status');
+				data.addColumn('number', 'Value');
+				for (var i=0; i<health.length; i++)
+				{
+				
+					if(health[i]===1)
+					{healthy++;}
+					else if(health[i]===2)
+					{unhealthy++;}
+				};
+				data.addRow(["Healthy",healthy]);				
+				data.addRow(["Unhealthy",unhealthy]);	
+				var options = {
+						'width':400,
+						'height':250
+					  };				
+
+			  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+			  chart.draw(data,options);
+			  var healthTotal=healthy+unhealthy;
+			  var healthyPercent=(healthy*100/healthTotal).toFixed(1);
+			  if(healthyPercent<50)
+			  {
+				$("#divHealthy").prepend("<p><h2>Healthy Condition: "+healthyPercent+"%</h2></p><p><h3>You are unhealthy,  we suggest you to visit your heath adviser.</p><p>You can also need to take break and calm yourself.</p></h3>");
+			  }
+			  else if(healthyPercent>=50 && healthyPercent<=60)
+			  {
+				$("#divHealthy").prepend("<p><h2>Healthy Condition: "+healthyPercent+"% </h2></p><p><h3>You are health is good, but we suggest you to do exercise atleast for 30 min a day.</p><p>You can also listen to music to make your body more relaxed.</p></h3>");
+			  }
+			  else if(healthyPercent>60 && healthyPercent<=70 )
+			  {
+				$("#divHealthy").prepend("<p><h2>Healthy Condition: "+healthyPercent+"%</h2></p><p><h3>You are health is normal, but we suggest you to do yoga.</p><p>You can also watch this video to cheer up your condition.</p></h3>");
+			  }
+			  else if(healthyPercent>70 && healthyPercent<=85)
+			  {
+				$("#divHealthy").prepend("<p><h2>Healthy Condition: "+healthyPercent+"%</h2></p><p><h3>You are health is better, but we suggest you to do some straching exercises.</p><p>You can also play this game like mind-reader or check your emotion level.</p></h3>");
+			  }
+			  else
+			  {
+				$("#divHealthy").prepend("<p><h2>Healthy Condition: "+healthyPercent+"%</h2></p><p><h3>You are perfectly healthy!!!</p></h3>");
+			  }
+            },
+			error: function(error) {
+				alert("Data not available");
+			}
+		});
+
+}
+function getHeartRate()
+{
+$.ajax({
+		url: "getJsonData",
+		type: "GET",
+		dataType: "json",
+		success: function(json, status){	
+			var smoothie = new SmoothieChart();
+			smoothie.streamTo(document.getElementById("mycanvas1"));
+			// Data
+			var line1 = new TimeSeries();
+			//var line2 = new TimeSeries();
+			
+			//match timestamp and heartrate
+			var timeArray = json.time;
+			var heartrate = json.heartrate1;
+			var i = 0; 
+			setInterval(function() {
+				line1.append(new Date().getTime(), heartrate[i]);
+				if (++i == timeArray.length)
+				{
+					i = 0;
+				}
+			}, 1000);
+			// Add to SmoothieChart
+			smoothie.addTimeSeries(line1);
+			//smoothie.addTimeSeries(line2);
+			smoothie.streamTo(document.getElementById("mycanvas1"),1000);
+
+		},
+		error: function(error) {
+			alert(JSON.stringify(error));
+		}
+	});
+
+}
+function getBloodPressure()
+{
+$.ajax({
+		url: "getJsonData",
+		type: "GET",
+		dataType: "json",
+		success: function(json, status){	
+			var smoothie = new SmoothieChart();
+			smoothie.streamTo(document.getElementById("mycanvas2"));
+			// Data
+			var line1 = new TimeSeries();
+			var line2 = new TimeSeries();
+			
+			//match timestamp and heartrate
+			var timeArray = json.time;
+			var systolic1 = json.systolic1;
+			var diastolic1 = json.diastolic1;
+			var i = 0; 
+			setInterval(function() {
+				line1.append(new Date().getTime(), systolic1[i]);
+				line2.append(new Date().getTime(), diastolic1[i]);
+				if (++i == timeArray.length)
+				{
+					i = 0;
+				}
+			}, 1000);
+			// Add to SmoothieChart
+			smoothie.addTimeSeries(line1);
+			smoothie.addTimeSeries(line2);
+			smoothie.streamTo(document.getElementById("mycanvas2"),1000);
+
+		},
+		error: function(error) {
+			alert(JSON.stringify(error));
+		}
+	});
+
+}
+function getEMG()
+{
+$.ajax({
+		url: "getJsonData",
+		type: "GET",
+		dataType: "json",
+		success: function(json, status){	
+			var smoothie = new SmoothieChart();
+			smoothie.streamTo(document.getElementById("mycanvas3"));
+			// Data
+			var line1 = new TimeSeries();
+			//var line2 = new TimeSeries();
+			
+			//match timestamp and EMG
+			var timeArray = json.time;
+			var emg = json.systolic1;
+			var i = 0; 
+			setInterval(function() {
+				line1.append(new Date().getTime(), emg[i]);
+				if (++i == timeArray.length)
+				{
+					i = 0;
+				}
+			}, 1000);
+			// Add to SmoothieChart
+			smoothie.addTimeSeries(line1);
+			//smoothie.addTimeSeries(line2);
+			smoothie.streamTo(document.getElementById("mycanvas3"),1000);
+
+		},
+		error: function(error) {
+			alert(JSON.stringify(error));
+		}
+	});
+}
+function getRespiration()
+{
+$.ajax({
+		url: "getJsonData",
+		type: "GET",
+		dataType: "json",
+		success: function(json, status){	
+			var smoothie = new SmoothieChart();
+			smoothie.streamTo(document.getElementById("mycanvas4"));
+			// Data
+			var line1 = new TimeSeries();
+			var line2 = new TimeSeries();
+			
+			//match timestamp and heartrate
+			var timeArray = json.time;
+			var systolic2 = json.systolic2;
+			//var diastolic2 = json.diastolic2;
+			var i = 0; 
+			setInterval(function() {
+				line1.append(new Date().getTime(), systolic2[i]);
+				//line2.append(new Date().getTime(), diastolic2[i]);
+				if (++i == timeArray.length)
+				{
+					i = 0;
+				}
+			}, 1000);
+			// Add to SmoothieChart
+			smoothie.addTimeSeries(line1);
+			//smoothie.addTimeSeries(line2);
+			smoothie.streamTo(document.getElementById("mycanvas4"),1000);
+
+		},
+		error: function(error) {
+			alert(JSON.stringify(error));
+		}
+	});
+
+}
+function getTemperature()
+{
+$.ajax({
+		url: "getJsonData",
+		type: "GET",
+		dataType: "json",
+		success: function(json, status){	
+			var smoothie = new SmoothieChart();
+			smoothie.streamTo(document.getElementById("mycanvas5"));
+			// Data
+			var line1 = new TimeSeries();
+			//var line2 = new TimeSeries();
+			
+			//match timestamp and temperature
+			var timeArray = json.time;
+			var temperature = json.heartrate2;
+			var i = 0; 
+			setInterval(function() {
+				line1.append(new Date().getTime(), temperature[i]);
+				if (++i == timeArray.length)
+				{
+					i = 0;
+				}
+			}, 1000);
+			// Add to SmoothieChart
+			smoothie.addTimeSeries(line1);
+			//smoothie.addTimeSeries(line2);
+			smoothie.streamTo(document.getElementById("mycanvas5"),1000);
+
+		},
+		error: function(error) {
+			alert(JSON.stringify(error));
+		}
+	});
+}
+function getBloodGlucose()
+{
+$.ajax({
+		url: "getJsonData",
+		type: "GET",
+		dataType: "json",
+		success: function(json, status){	
+			var smoothie = new SmoothieChart();
+			smoothie.streamTo(document.getElementById("mycanvas6"));
+			// Data
+			var line1 = new TimeSeries();
+			//var line2 = new TimeSeries();
+			
+			//match timestamp and bloodglucose
+			var timeArray = json.time;
+			var bloodglucose = json.diastolic1;
+			var i = 0; 
+			setInterval(function() {
+				line1.append(new Date().getTime(), bloodglucose[i]);
+				if (++i == timeArray.length)
+				{
+					i = 0;
+				}
+			}, 1000);
+			// Add to SmoothieChart
+			smoothie.addTimeSeries(line1);
+			//smoothie.addTimeSeries(line2);
+			smoothie.streamTo(document.getElementById("mycanvas6"),1000);
+
+		},
+		error: function(error) {
+			alert(JSON.stringify(error));
+		}
+	});
+}
+
+</script>
+		

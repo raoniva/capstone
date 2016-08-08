@@ -1,0 +1,43 @@
+<h1>log</h1>
+<div style="overflow:scroll;height:100%;width:100%">
+<table id="tblLog" border=1 style="height:100%;width:100%"></table>
+</div>	
+<script>
+$(document).ready(function () {
+    	$.ajax({
+		url: "getJsonData",
+		type: "GET",
+		dataType: "json",
+		success: function(json, status){	
+				var tr;
+				tr = $('<tr/>');
+					tr.append("<td>BloodGlucose </td>");
+					tr.append("<td>BloodPressure</td>");
+					tr.append("<td>EMG</td>");
+					tr.append("<td>Respiration</td>");
+					tr.append("<td>Heartrate</td>");
+					tr.append("<td>Temperature</td>");
+					tr.append("<td>Health</td>");
+					tr.append("<td>Time</td>");
+					tr.css({'font-weight' : 'bold'})
+					$('#tblLog').append(tr);
+				for (var i = 0; i < json.systolic1.length; i++) {
+					tr = $('<tr/>');
+					tr.append("<td>" + json.systolic1[i] + "</td>");
+					tr.append("<td>" + json.diastolic1[i] + "</td>");
+					tr.append("<td>" + json.systolic2[i] + "</td>");
+					tr.append("<td>" + json.diastolic2[i] + "</td>");
+					tr.append("<td>" + json.heartrate1[i] + "</td>");
+					tr.append("<td>" + json.heartrate2[i] + "</td>");
+					tr.append("<td>" + json.health[i] + "</td>");
+					tr.append("<td>" + json.time[i] + "</td>");
+					$('#tblLog').append(tr);
+				}	
+		},
+		error: function(error) {
+			alert("Data not available");
+		}
+	});
+});
+</script>
+		

@@ -1,0 +1,61 @@
+
+<h2 style="padding-top:25px">  </h2>
+
+
+<div class="form">
+	
+<form class="login-form">
+	
+	<label for="name">
+		<span>Username</span>
+		<input id="txtUser" type="text"/>
+		<span id="errUserName" style="display:none;">Please enter Username</span>
+	</label>
+	<label for="name">
+		<span>Password</span>
+		<input id="txtPwd" type="password"/>
+		<span id="errPassword" style="display:none;">Please enter Password</span>
+	</label>
+
+	<label for="login">
+		<span>
+		</br>
+	</span>
+	<button type="button" id="btnLogin">login</button>
+</label>
+
+<p class="message">Not registered? <a href="#">Create an account</a>
+</p>
+</form>
+</div>
+<script>
+$(document).ready(function(){
+					$("#btnLogin").click(function(){
+							var validator=true;
+							$("#errPassword").hide();
+							$("#errUserName").hide();
+							if($("#txtUser").val()==="")
+							{
+								$("#errUserName").show();
+								validator=false;
+							}
+							if($("#txtPwd").val()==="")
+							{
+								$("#errPassword").show();
+								validator=false;
+							}
+							if(validator)
+							{
+							
+							var v = $("#txtUser").val();					
+							$("#body").load("main.html",function(responseTxt, statusTxt, xhr){
+								if(statusTxt == "success"){
+									$("#userName").html(v);
+								}
+								if(statusTxt == "error")
+									alert("Error: " + xhr.status + ": " + xhr.statusText);							
+							});
+							}	
+					});
+				}); 
+</script>

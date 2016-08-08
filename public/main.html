@@ -1,0 +1,78 @@
+<div id="header">	
+	<table style="width:100%">
+		<tr>
+			<td align="center" style="width:10%">
+				<img style="vertical-align: top; width: 60px; height: 50px;" src="images/user.jpg"/>
+
+			</td>
+			<td align="left" style="width:10%">
+				<span id="userName" style="font-size: 25px;"/>
+				<br/>
+				<a href="" id="lnkLogout">Logout</a>
+			</td>
+
+			<td align="right" style="width:80%">
+			<select id="drpPage" class="page-navigation">
+				<option value="Dashboard.html">Dashboard</option>
+				<option value="Heartrate.html">Heart Rate</option>
+				<option value="Bloodpressure.html">Blood Pressure</option>
+				<option value="EMG.html">EMG</option>
+				<option value="Respiration.html">Respiration</option>
+				<option value="Temperature.html">Temperature</option>
+				<option value="Bloodglucose.html">Blood Glucose</option>
+				<option value="Log.html">Log</option>							
+			</select> 
+			</td>
+			<!-- <td align="right">
+				<ul id="navigation">
+					<li class="current">
+						<a>Dashboard</a>
+					</li>
+					<li>
+						<a>heartrate</a>
+					</li>			
+					<li>
+						<a>bloodpressure</a>
+					</li>
+					<li>
+						<a>EMG</a>
+					</li>
+					<li>
+						<a>BloodGlucose</a>
+					</li>
+					<li>
+						<a>Respiration</a>
+					</li>
+					<li>
+						<a>Temperature</a>
+					</li>
+					<li>
+						<a>Log</a>
+					</li>
+				</ul>
+			</td>
+ -->		</tr>
+	</table>
+</div>
+<div id="center">
+
+</div>
+<script>
+
+$(document).ready(function(){
+	google.charts.load('current', {packages:['corechart']});
+
+	$("#center").load("dashboard.html");
+	$('#drpPage').change(function(){		
+		$("#center").load(this.value);
+		//$(this).val(this.value)
+	});
+	$("#lnkLogout").click(function(){
+		$("#body").load("login.html");		
+	});
+});
+ 
+ 
+ 
+</script>
+		

@@ -1,0 +1,38 @@
+<html>
+<script type="text/javascript" src="js/jquery-2.2.0.min.js"></script>
+<body>
+	<p id="first">hellp world</p>
+	<form action="setData" method="post" enctype="application/x-www-form-urlencoded">
+		<textarea name="txt"></textarea>
+		<input type="submit" value="submit"/>
+	</form>
+	<script>
+	$.get('simulate.txt', function(txtData) {
+		offset = 1;
+		window.setInterval(function() {
+			lines = txtData.split('\n');
+			smp = lines[offset];
+			var now = new Date();
+			smp = now.toISOString() + "," + smp;
+			offset += 1;
+			if (offset + 1 > lines.length)
+			{
+				offset = 1;
+			}
+			$.ajax({
+				type: "POST",
+				url: "setData",
+				data: { txt: smp },
+				//dataType: "JSON",
+				success: function(data) {
+					$("#first").after("<p>success: " + data + "</p>");				
+				},
+				error: function(err) {
+					$("#first").after("<p style=\"color: red;\">error: " + err.responseText + "</p>");
+				}
+			});
+		}, 1000);
+	}, 'text');
+	</script>
+</body>
+</html>
